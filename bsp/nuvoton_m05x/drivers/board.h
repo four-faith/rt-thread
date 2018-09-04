@@ -21,18 +21,8 @@
 #define BOARD_PLL_CLOCK           50000000
 
 /* board configuration */
-
-#ifdef __CC_ARM
-extern int Image$$RW_IRAM1$$ZI$$Limit;
-#define M05X_SRAM_BEGIN    (&Image$$RW_IRAM1$$ZI$$Limit)
-#elif __ICCARM__
-#pragma section="HEAP"
-#define M05X_SRAM_BEGIN    (__segment_end("HEAP"))
-#else
-extern int __bss_end;
-#define M05X_SRAM_BEGIN    (&__bss_end)
-#endif
-
+// <o> Internal SRAM memory size[Kbytes]
+//	<i>Default: 64
 #define M05X_SRAM_SIZE         4
 #define M05X_SRAM_END          (0x20000000 + M05X_SRAM_SIZE * 1024)
 

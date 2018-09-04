@@ -32,10 +32,6 @@
 #include <rthw.h>
 #include <rtthread.h>
 
-#ifdef RT_USING_MODULE
-#include <dlmodule.h>
-#endif
-
 #if defined (RT_USING_HOOK)
 #ifndef RT_USING_IDLE_HOOK
 #define RT_USING_IDLE_HOOK
@@ -162,7 +158,7 @@ void rt_thread_idle_excute(void)
         rt_base_t lock;
         rt_thread_t thread;
 #ifdef RT_USING_MODULE
-        struct rt_dlmodule *module = RT_NULL;
+        rt_module_t module = RT_NULL;
 #endif
         RT_DEBUG_NOT_IN_INTERRUPT;
 
@@ -177,10 +173,14 @@ void rt_thread_idle_excute(void)
                                    struct rt_thread,
                                    tlist);
 #ifdef RT_USING_MODULE
-            module = (struct rt_dlmodule*)thread->module_id;
-            if (module)
+            /* get thread's parent module */
+            module = (rt_module_t)thread->module_id;
+
+            /* if the thread is module's main thread */
+            if (module != RT_NULL && module->module_thread == thread)
             {
-                dlmodule_destroy(module);
+                /* detach module's main thread */
+                module->module_thread = RT_NULL;
             }
 #endif
             /* remove defunct thread */

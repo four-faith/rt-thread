@@ -1,17 +1,8 @@
 from building import *
 
 cwd = GetCurrentDir()
-src = Split("""
-board.c
-stm32h7xx_it.c
-drv_mpu.c
-""")
+src = Glob('*.c')
 
-if GetDepend(['RT_USING_SERIAL']):
-    src += ['drv_usart.c']
-
-if GetDepend('RT_USING_LWIP'):
-    src += ['lan8742a.c']
 
 CPPPATH = [cwd]
 

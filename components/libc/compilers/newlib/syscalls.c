@@ -11,10 +11,6 @@
 #include <pthread.h>
 #endif
 
-#ifdef RT_USING_MODULE
-#include <dlmodule.h>
-#endif
-
 /* Reentrant versions of system calls.  */
 
 int
@@ -383,12 +379,18 @@ _free_r (struct _reent *ptr, void *addr)
 }
 
 void
-exit (int status)
+_exit (int status)
 {
 #ifdef RT_USING_MODULE
-    if (dlmodule_self())
+    rt_module_t module;
+
+    module = rt_module_self();
+    if (module != RT_NULL)
     {
-        dlmodule_exit(status);
+        rt_thread_suspend(rt_thread_self());
+
+        /* re-schedule */
+        rt_schedule();
     }
 #endif
 

@@ -47,7 +47,8 @@ int accept(int s, struct sockaddr *addr, socklen_t *addrlen)
         if (fd < 0)
         {
             rt_set_errno(-ENOMEM);
-            sal_closesocket(new_socket);
+            sal_closesocket(socket);
+
             return -1;
         }
 
@@ -73,8 +74,6 @@ int accept(int s, struct sockaddr *addr, socklen_t *addrlen)
             return fd;
         }
 
-        rt_set_errno(-ENOMEM);
-        sal_closesocket(new_socket);
         return -1;
     }
 

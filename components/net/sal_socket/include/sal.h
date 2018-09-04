@@ -25,15 +25,8 @@
 #ifndef SAL_H__
 #define SAL_H__
 
-#include <rtdevice.h>
-
-#ifdef SAL_USING_POSIX
 #include <dfs_file.h>
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <rtdevice.h>
 
 #if !defined(socklen_t) && !defined(SOCKLEN_T_DEFINED)
 typedef uint32_t socklen_t;
@@ -43,9 +36,7 @@ typedef uint32_t socklen_t;
 #define SAL_SOCKET_MAGIC               0x5A10
 
 /* The maximum number of sockets structure */
-#ifndef SAL_SOCKETS_NUM
 #define SAL_SOCKETS_NUM                DFS_FD_MAX
-#endif
 
 /* The maximum number of protocol families */
 #ifndef SAL_PROTO_FAMILIES_NUM
@@ -73,9 +64,7 @@ struct proto_ops
     int (*getpeername)(int s, struct sockaddr *name, socklen_t *namelen);
     int (*getsockname)(int s, struct sockaddr *name, socklen_t *namelen);
     int (*ioctlsocket)(int s, long cmd, void *arg);
-#ifdef SAL_USING_POSIX
     int (*poll)       (struct dfs_fd *file, struct rt_pollreq *req);
-#endif
 };
 
 struct sal_socket
@@ -93,9 +82,8 @@ struct sal_socket
 
 struct proto_family
 {
-    char name[RT_NAME_MAX];
-    int family;                        /* primary protocol families type */
-    int sec_family;                    /* secondary protocol families type */
+    int family;                        /* primary protocol families type*/
+    int sec_family;                    /* secondary protocol families type*/
     int             (*create)(struct sal_socket *sal_socket, int type, int protocol);   /* register socket options */
 
     struct hostent* (*gethostbyname)  (const char *name);
@@ -104,18 +92,10 @@ struct proto_family
     int             (*getaddrinfo)    (const char *nodename, const char *servname, const struct addrinfo *hints, struct addrinfo **res);
 };
 
-/* SAL(Socket Abstraction Layer) initialize */
+/* SAL socket initialization */
 int sal_init(void);
 
-struct sal_socket *sal_get_socket(int sock);
-
-/* protocol family register and unregister operate */
 int sal_proto_family_register(const struct proto_family *pf);
-int sal_proto_family_unregister(const struct proto_family *pf);
-struct proto_family *sal_proto_family_find(const char *name);
-
-#ifdef __cplusplus
-}
-#endif
+struct sal_socket *sal_get_socket(int sock);
 
 #endif /* SAL_H__ */

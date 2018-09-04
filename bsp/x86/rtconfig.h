@@ -175,5 +175,7 @@
 /* #define RTGUI_IMAGE_XPM */
 /* #define RTGUI_IMAGE_BMP */
 
-// #define RT_USING_MODULE
+#define RT_USING_LIBDL
+#define RT_USING_MODULE
+#define MODULE_USING_386
 #endif

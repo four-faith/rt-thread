@@ -1122,7 +1122,7 @@ am_hal_iom_workaround_word_write(uint32_t ui32ChipSelect,
 //! @return None.
 //
 //*****************************************************************************
-#if defined(__GNUC__)
+#if defined(__GNUC_STDC_INLINE__)
 static void __attribute__((naked))
 iom_workaround_loop(uint32_t ui32PadRegVal, volatile uint32_t *pui32PadReg,
                     bool bRising)
@@ -1164,7 +1164,8 @@ iom_workaround_loop(uint32_t ui32PadRegVal, volatile uint32_t *pui32PadReg,
     __asm("    str     r0, [r1]");
     __asm("    bx      lr");
 }
-#elif defined(__CC_ARM)
+#endif
+#ifdef keil
 __asm static void
 iom_workaround_loop(uint32_t ui32PadRegVal, volatile uint32_t *pui32PadReg,
                     bool bRising)
@@ -1207,7 +1208,8 @@ falling_check_mosi
     bx      lr
     nop
 }
-#elif defined(__ICCARM__)
+#endif
+#ifdef iar
 static void
 iom_workaround_loop(uint32_t ui32PadRegVal, volatile uint32_t *pui32PadReg,
                     bool bRising)

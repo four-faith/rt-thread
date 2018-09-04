@@ -1,11 +1,15 @@
 /*
- * Copyright (c) 2006-2018, RT-Thread Development Team
+ * File      : dlerror.c
+ * This file is part of RT-Thread RTOS
+ * COPYRIGHT (C) 2006 - 2010, RT-Thread Development Team
  *
- * SPDX-License-Identifier: Apache-2.0
- * 
+ * The license and distribution terms for this file may be
+ * found in the file LICENSE in this distribution or at
+ * http://www.rt-thread.org/license/LICENSE
+ *
  * Change Logs:
- * Date           Author      Notes
- * 2010-11-17     yi.qiu      first version
+ * Date           Author		Notes
+ * 2010-11-17      yi.qiu	first version
  */
 
 #include <rtthread.h>
@@ -15,4 +19,6 @@ const char *dlerror(void)
 {
 	return "TODO";
 }
+
 RTM_EXPORT(dlerror)
+

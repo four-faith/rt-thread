@@ -32,10 +32,6 @@
 #include <netdb.h>
 #include <sys/socket.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef AT_SOCKET_RECV_BFSZ
 #define AT_SOCKET_RECV_BFSZ            512
 #endif
@@ -77,11 +73,11 @@ typedef void (* at_socket_callback)(struct at_socket *conn, int event, uint16_t 
 /* AT device socket options function */
 struct at_device_ops
 {
-    int (*at_connect)(int socket, char *ip, int32_t port, enum at_socket_type type, rt_bool_t is_client);
-    int (*at_closesocket)(int socket);
-    int (*at_send)(int socket, const char *buff, size_t bfsz, enum at_socket_type type);
-    int (*at_domain_resolve)(const char *name, char ip[16]);
-    void (*at_set_event_cb)(at_socket_evt_t event, at_evt_cb_t cb);
+    int (*connect)(int socket, char *ip, int32_t port, enum at_socket_type type, rt_bool_t is_client);
+    int (*close)(int socket);
+    int (*send)(int socket, const char *buff, size_t bfsz, enum at_socket_type type);
+    int (*domain_resolve)(const char *name, char ip[16]);
+    void (*set_event_cb)(at_socket_evt_t event, at_evt_cb_t cb);
 };
 
 /* AT receive package list structure */
@@ -148,7 +144,7 @@ void at_scoket_device_register(const struct at_device_ops *ops);
 #ifndef RT_USING_SAL
 
 #define socket(domain, type, protocol)                      at_socket(domain, type, protocol)
-#define closesocket(socket)                                 at_closesocket(socket)
+#define closescoket(socket)                                 at_closesocket(socket)
 #define shutdown(socket, how)                               at_shutdown(socket, how)
 #define bind(socket, name, namelen)                         at_bind(socket, name, namelen)
 #define connect(socket, name, namelen)                      at_connect(socket, name, namelen)
@@ -163,9 +159,5 @@ void at_scoket_device_register(const struct at_device_ops *ops);
 #define freeaddrinfo(ai)                                    at_freeaddrinfo(ai)
 
 #endif /* RT_USING_SAL */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* AT_SOCKET_H__ */

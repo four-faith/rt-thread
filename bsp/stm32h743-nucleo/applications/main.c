@@ -23,10 +23,35 @@
  * 2014-04-27     Bernard      make code cleanup.
  * 2017-08-25     LongfeiMa    transplantation for stm32h7xx
  */
-#include <stdio.h>
+
+#include <rthw.h>
+#include <rtthread.h>
+
+#include "board.h"
+#include <stm32h7xx.h>
+
+#include "lan8742a.h"
+
+#include "netif/ethernetif.h"
+
+
 
 int main(void)
 {
-	return 0;
+//	rt_kprintf("here we are in the main \r\n");
+	/* LwIP Initialization */
+#ifdef RT_USING_LWIP
+	{
+//		extern void lwip_sys_init(void);
+//		eth_system_device_init();
+
+		/* register ethernetif device */
+//		rt_hw_lan8742a_init();
+
+		/* init lwip system */
+//		lwip_sys_init();
+		rt_kprintf("TCP/IP initialized!\n");
+	}
+#endif
 }
 
