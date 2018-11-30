@@ -23,6 +23,8 @@
 #define LOG_TAG              "at.skt"
 #include <at_log.h>
 
+#ifdef AT_USING_SOCKET
+
 #define HTONS_PORT(x) ((((x) & 0x00ffUL) << 8) | (((x) & 0xff00UL) >> 8))
 #define NIPQUAD(addr) \
         ((unsigned char *)&addr)[0], \
@@ -620,6 +622,9 @@ int at_recvfrom(int socket, void *mem, size_t len, int flags, struct sockaddr *f
             goto __exit;
         }
         sock->state = AT_SOCKET_CONNECT;
+        /* set AT socket receive data callback function */
+        at_dev_ops->at_set_event_cb(AT_SOCKET_EVT_RECV, at_recv_notice_cb);
+        at_dev_ops->at_set_event_cb(AT_SOCKET_EVT_CLOSED, at_closed_notice_cb);
     }
 
     /* socket passively closed, receive function return 0 */
@@ -655,6 +660,10 @@ int at_recvfrom(int socket, void *mem, size_t len, int flags, struct sockaddr *f
     {
         timeout = RT_WAITING_FOREVER;
     }
+    else
+    {
+        timeout = rt_tick_from_millisecond(timeout);
+    }
 
     while (1)
     {
@@ -662,6 +671,7 @@ int at_recvfrom(int socket, void *mem, size_t len, int flags, struct sockaddr *f
         if (rt_sem_take(sock->recv_notice, timeout) < 0)
         {
             LOG_E("AT socket (%d) receive timeout (%d)!", socket, timeout);
+            errno = EAGAIN;
             result = -1;
             goto __exit;
         }
@@ -693,7 +703,7 @@ __exit:
     {
         result = recv_len;
         at_do_event_changes(sock, AT_EVENT_RECV, RT_FALSE);
-
+        errno = 0;
         if (!rt_slist_isempty(&sock->recvpkt_list))
         {
             at_do_event_changes(sock, AT_EVENT_RECV, RT_TRUE);
@@ -1161,7 +1171,7 @@ void at_freeaddrinfo(struct addrinfo *ai)
     }
 }
 
-void at_scoket_device_register(const struct at_device_ops *ops)
+void at_socket_device_register(const struct at_device_ops *ops)
 {
     RT_ASSERT(ops);
     RT_ASSERT(ops->at_connect);
@@ -1171,3 +1181,5 @@ void at_scoket_device_register(const struct at_device_ops *ops)
     RT_ASSERT(ops->at_set_event_cb);
     at_dev_ops = (struct at_device_ops *) ops;
 }
+
+#endif /* AT_USING_SOCKET */
