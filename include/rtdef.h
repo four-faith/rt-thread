@@ -29,6 +29,10 @@
  * 2018-11-22     Jesven       add smp member to struct rt_thread
  *                             add struct rt_cpu
  *                             add smp relevant macros
+ * 2019-01-27     Bernard      change version number to v4.0.1
+ * 2019-05-17     Bernard      change version number to v4.0.2
+ * 2019-12-20     Bernard      change version number to v4.0.3
+ * 2020-08-10     Meco Man     add macro for struct rt_device_ops
  */
 
 #ifndef __RT_DEF_H__
@@ -45,18 +49,19 @@ extern "C" {
  * @addtogroup BasicDef
  */
 
-/*@{*/
+/**@{*/
 
 /* RT-Thread version information */
 #define RT_VERSION                      4L              /**< major version number */
 #define RT_SUBVERSION                   0L              /**< minor version number */
-#define RT_REVISION                     0L              /**< revise version number */
+#define RT_REVISION                     3L              /**< revise version number */
 
 /* RT-Thread version */
 #define RTTHREAD_VERSION                ((RT_VERSION * 10000) + \
                                          (RT_SUBVERSION * 100) + RT_REVISION)
 
 /* RT-Thread basic data type definitions */
+#ifndef RT_USING_ARCH_DATA_TYPE
 typedef signed   char                   rt_int8_t;      /**<  8bit integer type */
 typedef signed   short                  rt_int16_t;     /**< 16bit integer type */
 typedef signed   int                    rt_int32_t;     /**< 32bit integer type */
@@ -70,6 +75,7 @@ typedef unsigned long                   rt_uint64_t;    /**< 64bit unsigned inte
 #else
 typedef signed long long                rt_int64_t;     /**< 64bit integer type */
 typedef unsigned long long              rt_uint64_t;    /**< 64bit unsigned integer type */
+#endif
 #endif
 
 typedef int                             rt_bool_t;      /**< boolean type */
@@ -88,7 +94,7 @@ typedef rt_base_t                       rt_off_t;       /**< Type for offset */
 #define RT_TRUE                         1               /**< boolean true  */
 #define RT_FALSE                        0               /**< boolean fails */
 
-/*@}*/
+/**@}*/
 
 /* maximum value of base type */
 #define RT_UINT8_MAX                    0xff            /**< Maxium number of UINT8 */
@@ -196,11 +202,11 @@ typedef int (*init_fn_t)(void);
         };
         #define INIT_EXPORT(fn, level)                                                       \
             const char __rti_##fn##_name[] = #fn;                                            \
-            RT_USED const struct rt_init_desc __rt_init_desc_##fn SECTION(".rti_fn."level) = \
+            RT_USED const struct rt_init_desc __rt_init_desc_##fn SECTION(".rti_fn." level) = \
             { __rti_##fn##_name, fn};
     #else
         #define INIT_EXPORT(fn, level)                                                       \
-            RT_USED const init_fn_t __rt_init_##fn SECTION(".rti_fn."level) = fn
+            RT_USED const init_fn_t __rt_init_##fn SECTION(".rti_fn." level) = fn
     #endif
 #endif
 #else
@@ -259,7 +265,7 @@ typedef int (*init_fn_t)(void);
  * @addtogroup Error
  */
 
-/*@{*/
+/**@{*/
 
 /* RT-Thread error code definitions */
 #define RT_EOK                          0               /**< There is no error */
@@ -274,7 +280,7 @@ typedef int (*init_fn_t)(void);
 #define RT_EINTR                        9               /**< Interrupted system call */
 #define RT_EINVAL                       10              /**< Invalid argument */
 
-/*@}*/
+/**@}*/
 
 /**
  * @ingroup BasicDef
@@ -325,7 +331,7 @@ typedef struct rt_slist_node rt_slist_t;                /**< Type for single lis
  * @addtogroup KernelObject
  */
 
-/*@{*/
+/**@{*/
 
 /*
  * kernel object macros
@@ -367,19 +373,20 @@ typedef struct rt_object *rt_object_t;                  /**< Type for kernel obj
  */
 enum rt_object_class_type
 {
-    RT_Object_Class_Thread = 0,                         /**< The object is a thread. */
-    RT_Object_Class_Semaphore,                          /**< The object is a semaphore. */
-    RT_Object_Class_Mutex,                              /**< The object is a mutex. */
-    RT_Object_Class_Event,                              /**< The object is a event. */
-    RT_Object_Class_MailBox,                            /**< The object is a mail box. */
-    RT_Object_Class_MessageQueue,                       /**< The object is a message queue. */
-    RT_Object_Class_MemHeap,                            /**< The object is a memory heap */
-    RT_Object_Class_MemPool,                            /**< The object is a memory pool. */
-    RT_Object_Class_Device,                             /**< The object is a device */
-    RT_Object_Class_Timer,                              /**< The object is a timer. */
-    RT_Object_Class_Module,                             /**< The object is a module. */
-    RT_Object_Class_Unknown,                            /**< The object is unknown. */
-    RT_Object_Class_Static = 0x80                       /**< The object is a static object. */
+    RT_Object_Class_Null          = 0x00,      /**< The object is not used. */
+    RT_Object_Class_Thread        = 0x01,      /**< The object is a thread. */
+    RT_Object_Class_Semaphore     = 0x02,      /**< The object is a semaphore. */
+    RT_Object_Class_Mutex         = 0x03,      /**< The object is a mutex. */
+    RT_Object_Class_Event         = 0x04,      /**< The object is a event. */
+    RT_Object_Class_MailBox       = 0x05,      /**< The object is a mail box. */
+    RT_Object_Class_MessageQueue  = 0x06,      /**< The object is a message queue. */
+    RT_Object_Class_MemHeap       = 0x07,      /**< The object is a memory heap. */
+    RT_Object_Class_MemPool       = 0x08,      /**< The object is a memory pool. */
+    RT_Object_Class_Device        = 0x09,      /**< The object is a device. */
+    RT_Object_Class_Timer         = 0x0a,      /**< The object is a timer. */
+    RT_Object_Class_Module        = 0x0b,      /**< The object is a module. */
+    RT_Object_Class_Unknown       = 0x0c,      /**< The object is unknown. */
+    RT_Object_Class_Static        = 0x80       /**< The object is a static object. */
 };
 
 /**
@@ -402,13 +409,13 @@ struct rt_object_information
 #define RT_OBJECT_HOOK_CALL(func, argv)
 #endif
 
-/*@}*/
+/**@}*/
 
 /**
  * @addtogroup Clock
  */
 
-/*@{*/
+/**@{*/
 
 /**
  * clock & timer macros
@@ -425,6 +432,7 @@ struct rt_object_information
 #define RT_TIMER_CTRL_GET_TIME          0x1             /**< get timer control command */
 #define RT_TIMER_CTRL_SET_ONESHOT       0x2             /**< change timer to one shot */
 #define RT_TIMER_CTRL_SET_PERIODIC      0x3             /**< change timer to periodic */
+#define RT_TIMER_CTRL_GET_STATE         0x4             /**< get timer run state active or deactive*/
 
 #ifndef RT_TIMER_SKIP_LIST_LEVEL
 #define RT_TIMER_SKIP_LIST_LEVEL          1
@@ -452,7 +460,7 @@ struct rt_timer
 };
 typedef struct rt_timer *rt_timer_t;
 
-/*@}*/
+/**@}*/
 
 /**
  * @addtogroup Signal
@@ -465,13 +473,13 @@ typedef siginfo_t rt_siginfo_t;
 
 #define RT_SIG_MAX          32
 #endif
-/*@}*/
+/**@}*/
 
 /**
  * @addtogroup Thread
  */
 
-/*@{*/
+/**@{*/
 
 /*
  * Thread
@@ -486,11 +494,15 @@ typedef siginfo_t rt_siginfo_t;
 #define RT_THREAD_RUNNING               0x03                /**< Running status */
 #define RT_THREAD_BLOCK                 RT_THREAD_SUSPEND   /**< Blocked status */
 #define RT_THREAD_CLOSE                 0x04                /**< Closed status */
-#define RT_THREAD_STAT_MASK             0x0f
+#define RT_THREAD_STAT_MASK             0x07
 
-#define RT_THREAD_STAT_SIGNAL           0x10
+#define RT_THREAD_STAT_YIELD            0x08                /**< indicate whether remaining_tick has been reloaded since last schedule */
+#define RT_THREAD_STAT_YIELD_MASK       RT_THREAD_STAT_YIELD
+
+#define RT_THREAD_STAT_SIGNAL           0x10                /**< task hold signals */
 #define RT_THREAD_STAT_SIGNAL_READY     (RT_THREAD_STAT_SIGNAL | RT_THREAD_READY)
-#define RT_THREAD_STAT_SIGNAL_WAIT      0x20
+#define RT_THREAD_STAT_SIGNAL_WAIT      0x20                /**< task is waiting for signals */
+#define RT_THREAD_STAT_SIGNAL_PENDING   0x40                /**< signals is held and it has not been procressed */
 #define RT_THREAD_STAT_SIGNAL_MASK      0xf0
 
 /**
@@ -500,20 +512,20 @@ typedef siginfo_t rt_siginfo_t;
 #define RT_THREAD_CTRL_CLOSE            0x01                /**< Close thread. */
 #define RT_THREAD_CTRL_CHANGE_PRIORITY  0x02                /**< Change thread priority. */
 #define RT_THREAD_CTRL_INFO             0x03                /**< Get thread information. */
-#define RT_THREAD_CTRL_BIND_CPU         0x03                /**< Set thread bind cpu. */
+#define RT_THREAD_CTRL_BIND_CPU         0x04                /**< Set thread bind cpu. */
 
 #ifdef RT_USING_SMP
 
 #define RT_CPU_DETACHED                 RT_CPUS_NR          /**< The thread not running on cpu. */
 #define RT_CPU_MASK                     ((1 << RT_CPUS_NR) - 1) /**< All CPUs mask bit. */
 
-#ifndef RT_SCHEDULE_IPI_IRQ
-#define RT_SCHEDULE_IPI_IRQ             0
+#ifndef RT_SCHEDULE_IPI
+#define RT_SCHEDULE_IPI                 0
 #endif
 
 /**
  * CPUs definitions
- * 
+ *
  */
 struct rt_cpu
 {
@@ -571,6 +583,7 @@ struct rt_thread
 
     rt_uint16_t scheduler_lock_nest;                    /**< scheduler lock count */
     rt_uint16_t cpus_lock_nest;                         /**< cpus lock count */
+    rt_uint16_t critical_lock_nest;                     /**< critical lock count */
 #endif /*RT_USING_SMP*/
 
     /* priority */
@@ -592,7 +605,9 @@ struct rt_thread
     rt_sigset_t     sig_pending;                        /**< the pending signals */
     rt_sigset_t     sig_mask;                           /**< the mask bits of signal */
 
+#ifndef RT_USING_SMP
     void            *sig_ret;                           /**< the return stack pointer from signal */
+#endif
     rt_sighandler_t *sig_vectors;                       /**< vectors of signal handler */
     void            *si_list;                           /**< the signal infor list */
 #endif
@@ -609,17 +624,17 @@ struct rt_thread
     void        *lwp;
 #endif
 
-    rt_uint32_t user_data;                             /**< private user data beyond this thread */
+    rt_ubase_t user_data;                             /**< private user data beyond this thread */
 };
 typedef struct rt_thread *rt_thread_t;
 
-/*@}*/
+/**@}*/
 
 /**
  * @addtogroup IPC
  */
 
-/*@{*/
+/**@{*/
 
 /**
  * IPC flags and control command definitions
@@ -652,6 +667,7 @@ struct rt_semaphore
     struct rt_ipc_object parent;                        /**< inherit from ipc_object */
 
     rt_uint16_t          value;                         /**< value of semaphore. */
+    rt_uint16_t          reserved;                      /**< reserved field */
 };
 typedef struct rt_semaphore *rt_sem_t;
 #endif
@@ -733,17 +749,19 @@ struct rt_messagequeue
     void                *msg_queue_head;                /**< list head */
     void                *msg_queue_tail;                /**< list tail */
     void                *msg_queue_free;                /**< pointer indicated the free node of queue */
+
+    rt_list_t            suspend_sender_thread;         /**< sender thread suspended on this message queue */
 };
 typedef struct rt_messagequeue *rt_mq_t;
 #endif
 
-/*@}*/
+/**@}*/
 
 /**
  * @addtogroup MM
  */
 
-/*@{*/
+/**@{*/
 
 /*
  * memory management
@@ -806,19 +824,18 @@ struct rt_mempool
     rt_size_t        block_free_count;                  /**< numbers of free memory block */
 
     rt_list_t        suspend_thread;                    /**< threads pended on this resource */
-    rt_size_t        suspend_thread_count;              /**< numbers of thread pended on this resource */
 };
 typedef struct rt_mempool *rt_mp_t;
 #endif
 
-/*@}*/
+/**@}*/
 
 #ifdef RT_USING_DEVICE
 /**
  * @addtogroup Device
  */
 
-/*@{*/
+/**@{*/
 
 /**
  * device (I/O) class type
@@ -844,6 +861,8 @@ enum rt_device_class_type
     RT_Device_Class_Portal,                             /**< Portal device */
     RT_Device_Class_Timer,                              /**< Timer device */
     RT_Device_Class_Miscellaneous,                      /**< Miscellaneous device */
+    RT_Device_Class_Sensor,                             /**< Sensor device */
+    RT_Device_Class_Touch,                              /**< Touch device */
     RT_Device_Class_Unknown                             /**< unknown device */
 };
 
@@ -880,6 +899,7 @@ enum rt_device_class_type
 #define RT_DEVICE_CTRL_RESUME           0x01            /**< resume device */
 #define RT_DEVICE_CTRL_SUSPEND          0x02            /**< suspend device */
 #define RT_DEVICE_CTRL_CONFIG           0x03            /**< configure device */
+#define RT_DEVICE_CTRL_CLOSE            0x04            /**< close device */
 
 #define RT_DEVICE_CTRL_SET_INT          0x10            /**< set interrupt */
 #define RT_DEVICE_CTRL_CLR_INT          0x11            /**< clear interrupt */
@@ -901,6 +921,8 @@ enum rt_device_class_type
 #define RT_DEVICE_CTRL_RTC_SET_ALARM    0x13            /**< set alarm */
 
 typedef struct rt_device *rt_device_t;
+
+#ifdef RT_USING_DEVICE_OPS
 /**
  * operations set for device object
  */
@@ -914,6 +936,7 @@ struct rt_device_ops
     rt_size_t (*write)  (rt_device_t dev, rt_off_t pos, const void *buffer, rt_size_t size);
     rt_err_t  (*control)(rt_device_t dev, int cmd, void *args);
 };
+#endif
 
 /**
  * WaitQueue structure
@@ -1015,6 +1038,7 @@ enum
     RTGRAPHIC_PIXEL_FORMAT_ABGR888,
     RTGRAPHIC_PIXEL_FORMAT_ARGB565,
     RTGRAPHIC_PIXEL_FORMAT_ALPHA,
+    RTGRAPHIC_PIXEL_FORMAT_COLOR,
 };
 
 /**
@@ -1063,7 +1087,7 @@ struct rt_device_graphic_ops
 };
 #define rt_graphix_ops(device)          ((struct rt_device_graphic_ops *)(device->user_data))
 
-/*@}*/
+/**@}*/
 #endif
 
 /* definitions for libc */

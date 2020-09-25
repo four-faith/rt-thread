@@ -52,7 +52,7 @@ void rt_interrupt_leave_sethook(void (*hook)(void))
 #ifdef RT_USING_SMP
 #define rt_interrupt_nest rt_cpu_self()->irq_nest
 #else
-volatile rt_uint8_t rt_interrupt_nest;
+volatile rt_uint8_t rt_interrupt_nest = 0;
 #endif
 
 /**
@@ -105,7 +105,7 @@ RTM_EXPORT(rt_interrupt_leave);
  *
  * @return the number of nested interrupts.
  */
-rt_uint8_t rt_interrupt_get_nest(void)
+RT_WEAK rt_uint8_t rt_interrupt_get_nest(void)
 {
     rt_uint8_t ret;
     rt_base_t level;

@@ -5,14 +5,12 @@
 
 #define DEBUG_UDP_CLIENT
 
-#define DBG_ENABLE
-#define DBG_SECTION_NAME               "UDP"
+#define DBG_TAG               "UDP"
 #ifdef DEBUG_UDP_CLIENT
-#define DBG_LEVEL                      DBG_LOG
+#define DBG_LVL               DBG_LOG
 #else
-#define DBG_LEVEL                      DBG_INFO /* DBG_ERROR */
+#define DBG_LVL               DBG_INFO /* DBG_ERROR */
 #endif
-#define DBG_COLOR
 #include <rtdbg.h>
 
 static int started = 0;
@@ -119,8 +117,8 @@ static void udpclient_test(int argc, char** argv)
         {
             if (started)
             {
-                LOG_I("The tcpclient has started!");
-                LOG_I("Please stop tcpclient firstly, by: tcpclient --stop");
+                LOG_I("The udpclient has started!");
+                LOG_I("Please stop udpclient firstly, by: udpclient --stop");
                 return;
             }
 
